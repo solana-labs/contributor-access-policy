@@ -1,0 +1,27 @@
+name: SPL Triage Access Request
+description: Issue template to request Level 1 access to the SPL repository
+title: "Requesting Access Level 1 for [User] to the SPL repository"
+labels: ["access"]
+assignees:
+  - joeaba
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please, complete the following information to proceed with your access request:
+  - type: input
+    id: username
+    attributes:
+      label: GitHub Username
+      description: What's your GitHub Username?
+      placeholder: ex. joeaba
+    validations:
+      required: true
+  - type: input
+    id: discord_id
+    attributes:
+      label: Discord ID
+      description: What's your Discord ID? 
+      placeholder: ex. joe#1234
+    validations:
+      required: true

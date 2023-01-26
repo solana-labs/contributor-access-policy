@@ -1,0 +1,35 @@
+name: Monorepo Write Access Request
+description: Issue template to request Level 2 access to the Solana Labs Monorepo
+title: "Requesting Access Level 2 for [User] to the Solana Labs Monorepo"
+labels: ["access"]
+assignees:
+  - joeaba
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please, complete the following information to proceed with your access request:
+  - type: input
+    id: username
+    attributes:
+      label: GitHub Username
+      description: What's your GitHub Username?
+      placeholder: ex. joeaba
+    validations:
+      required: true
+  - type: input
+    id: discord_id
+    attributes:
+      label: Discord ID
+      description: What's your Discord ID? 
+      placeholder: ex. joe#1234
+    validations:
+      required: true
+  - type: input
+    id: previous_access_issue
+    attributes:
+      label: Previously approved access issue
+      description: Link to previously approved access issue
+      placeholder: ex. https://github.com/solana-labs/contributor-access-policy/issues/X
+    validations:
+      required: true  

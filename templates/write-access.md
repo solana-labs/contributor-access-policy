@@ -14,4 +14,4 @@ Assignees: Maintainers
   appropriate number of vouchers from others.
 -->
 Discord ID:\
-Link previously approved access issue: 
+Link to previously approved access issue: 

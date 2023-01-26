@@ -1,13 +1,13 @@
 ---
-Name: Access Voucher
-About: Request maintain access for [Repository]
-Title: Request Access (Level 3) for [Username]
-Labels: Access
-Assignees: Maintainers
+name: Access Voucher
+about: Request write access to the Solana monorepo
+title: Request Access (Level 2) for [Username]
+labels: access
+assignees: joeaba
 
 ---
 
-## Requesting Access Level 3 for [Username] to [Repository]
+## Requesting Access Level 2 for [Username] to the Solana monorepo
 <!--
   Access requests are defined in the Contributor Access Policy repository
   It is up to you as the requester to gather the

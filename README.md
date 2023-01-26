@@ -24,7 +24,7 @@ in accordance with Github access policies.
 2. Write
 
     Requirement: Two vouchers from anyone with level 3 access or two from
-anyone with level 2 access. A contributor with Write access will be able to triage pull requests
+anyone with level 2 access. A contributor with Write access will be able to merge pull requests
 in accordance with Github access policies.
 
 3. Maintain

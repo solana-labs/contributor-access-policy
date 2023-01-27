@@ -1,0 +1,35 @@
+name: SPL Write Access Request
+description: Issue template to request Level 2 access to the SPL repository
+title: "Access Level 2 for [User] to the SPL repository"
+labels: ["access"]
+assignees:
+  - joeaba
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please complete the following information to proceed with your access request:
+  - type: input
+    id: username
+    attributes:
+      label: GitHub Username
+      description: What's your GitHub Username?
+      placeholder: ex. joeaba
+    validations:
+      required: true
+  - type: input
+    id: discord_id
+    attributes:
+      label: Discord ID
+      description: What's your Discord ID? 
+      placeholder: ex. joe#1234
+    validations:
+      required: true
+  - type: input
+    id: previous_access_issue
+    attributes:
+      label: Previously approved access level 1 issue
+      description: URL to previously approved issue for Access Level 1 to the SPL repository
+      placeholder: ex. https://github.com/solana-labs/contributor-access-policy/issues/X
+    validations:
+      required: true  

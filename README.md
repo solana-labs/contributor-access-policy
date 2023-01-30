@@ -75,6 +75,18 @@ granting user access based on the above requirements.
 
 Any of the above access levels will grant you the Contributor role in the Solana Tech Discord server and a role tag with your current access level and the respective repository (e.g. SLP-Triage, Mono-Triage).
 
+If you are only interested in getting the Contributor role on Discord without requesting GitHub access, then you can request an existing Contributor to vouch for you in the #contributor-roles-requests channel. The requests should be made in the following format:
+
+```
+"I'd like to request the Contributor role for @USER"
+```
+
+If you'd like to request a role removal for an existing Contributor, you should do it in the #contributor-roles-requests channel and follow this format:
+
+```
+"I'd like to request Contributor role removal for @USER because [REASON]"
+```
+
 ### Vouching Process 
 
 To receive any access level to the SPL repository or the monorepo, follow these steps:

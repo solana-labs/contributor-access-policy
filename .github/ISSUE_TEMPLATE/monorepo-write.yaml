@@ -13,7 +13,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please complete the following information to proceed with your access request:
+        Please complete the following information to proceed with your access request,
+        make sure to update [User] with your GitHub username in the issue title:
   - type: input
     id: username
     attributes:

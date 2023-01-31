@@ -4,6 +4,12 @@ title: "Access Level 1 for [User] to the Solana Labs Monorepo"
 labels: ["access"]
 assignees:
   - joeaba
+  - mvines
+  - CriesofCarrots
+  - t-nelson
+  - sakridge
+  - jackcmay
+  - yihau
 body:
   - type: markdown
     attributes:

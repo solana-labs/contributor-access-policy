@@ -92,7 +92,7 @@ If you'd like to request a role removal for an existing Contributor, you should 
 To receive any access level to the SPL repository or the monorepo, follow these steps:
 
 1. Open an issue on the [Contributor Access Policy](https://github.com/solana-labs/contributor-access-policy) repository
-following the [templates for the respective access level](tbd).
+following the [templates for the respective access level](https://github.com/solana-labs/contributor-access-policy/issues/new/choose).
 2. Gather your vouchers to add a comment on the issue expressing their support.
 3. Once the issue has received enough support, notify a user with Maintain
 access to the respective repository by adding a comment tagging him. A list of members and their access levels can be found [here](https://github.com/solana-labs/contributor-access-policy/wiki). 

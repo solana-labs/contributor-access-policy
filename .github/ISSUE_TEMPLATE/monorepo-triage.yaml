@@ -1,6 +1,6 @@
 name: Monorepo Triage Access Request
-description: Issue template to request Level 1 access to the Solana Labs Monorepo
-title: "Access Level 1 for [User] to the Solana Labs Monorepo"
+description: Issue template to request Triage access to the Solana Labs Monorepo
+title: "Request Triage access for [User] to the Solana Labs Monorepo"
 labels: ["access"]
 assignees:
   - joeaba

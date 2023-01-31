@@ -4,6 +4,13 @@ title: "Access Level 2 for [User] to the SPL repository"
 labels: ["access"]
 assignees:
   - joeaba
+  - mvines
+  - CriesofCarrots
+  - t-nelson
+  - sakridge
+  - jackcmay
+  - yihau
+  - joncinque
 body:
   - type: markdown
     attributes:

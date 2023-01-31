@@ -48,8 +48,7 @@ for the [Solana Program Library](https://github.com/solana-labs/solana-program-l
 
 ### Level 2 - Write Access
 
-Requirements: Two vouchers from anyone with level 3 access or two vouchers from
-anyone with level 2 access to the respective repository. Applicants must have level 1 access to apply for level 2.
+Requirements: Two vouchers from anyone with level 2/3 access to the respective repository. Applicants must have level 1 access to apply for level 2.
 
 Contributors with Write access will have the associated [write Github access
 policy](https://docs.github.com/en/organizations/managing-user-access-to-your-organizations-repositories/repository-roles-for-an-organization#permissions-for-each-role)

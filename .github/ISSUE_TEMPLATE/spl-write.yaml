@@ -1,6 +1,6 @@
 name: SPL Write Access Request
-description: Issue template to request Level 2 access to the SPL repository
-title: "Access Level 2 for [User] to the SPL repository"
+description: Issue template to request Write access to the SPL repository
+title: "Request Write access for [User] to the SPL repository"
 labels: ["access"]
 assignees:
   - joeaba
@@ -35,8 +35,8 @@ body:
   - type: input
     id: previous_access_issue
     attributes:
-      label: Previously approved access level 1 issue
-      description: URL to previously approved issue for Access Level 1 to the SPL repository
+      label: Previously approved Triage access request issue
+      description: Link to previously approved access request issue
       placeholder: ex. https://github.com/solana-labs/contributor-access-policy/issues/X
     validations:
       required: true  

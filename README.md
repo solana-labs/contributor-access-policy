@@ -10,7 +10,7 @@ there are many different ways for you to get involved, including answering quest
 Access is granted based on the repository you are interested in contributing to:
 
 1. The [Solana Program Library (SPL) repository](https://github.com/solana-labs/solana-program-library).
-2. The [Solana monorepo](https://github.com/solana-labs/solana).
+2. The [Solana Labs monorepo](https://github.com/solana-labs/solana).
 
 #### Access Levels
 

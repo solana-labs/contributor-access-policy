@@ -44,7 +44,7 @@ Requirements: One voucher from any user with level 2 or above access to the resp
 Contributors with Triage access will have the associated [triage Github access
 policy](https://docs.github.com/en/organizations/managing-user-access-to-your-organizations-repositories/repository-roles-for-an-organization#permissions-for-each-role)
 for the [Solana Program Library](https://github.com/solana-labs/solana-program-library) (SPL) repository or the
-[Solana](https://github.com/solana-labs/solana) monorepo.
+[Solana](https://github.com/solana-labs/solana) monorepo as well as access to Solana Labs' Buildkite CI.
 
 ### Level 2 - Write Access
 
@@ -56,7 +56,7 @@ for the [Solana Program Library](https://github.com/solana-labs/solana-program-l
 [Solana](https://github.com/solana-labs/solana) monorepo.
 
 Most notably these permissions allow the contributor to approve and merge pull
-requests and gets them access to Solana Labs' Buildkite CI.
+requests.
 
 ### Level 3 - Maintain Access
 

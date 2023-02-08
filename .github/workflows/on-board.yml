@@ -20,27 +20,8 @@ jobs:
               body: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             })
 
-  check_privilege:
-    needs: [link_to_issue]
-    runs-on: ubuntu-latest
-    steps:
-      - name: check privilege
-        run: |
-          maintainers=(
-            "mvines"
-            "CriesofCarrots"
-            "joeaba"
-            "t-nelson"
-            "sakridge"
-            "yihau"
-            "joncinque"
-          )
-          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
-            exit 1
-          fi
-
   parse_info:
-    needs: check_privilege
+    needs: link_to_issue
     runs-on: ubuntu-latest
     outputs:
       org: ${{ steps.main.outputs.org }}
@@ -101,9 +82,51 @@ jobs:
           echo "previous_team_slug=$previous_team_slug" >> $GITHUB_OUTPUT
           echo "team_slug=$team_slug" >> $GITHUB_OUTPUT
 
-  remove_from_previous_team:
+  check_privilege_for_mono:
     needs: [parse_info]
-    if: needs.parse_info.outputs.previous_team_slug != ''
+    if: contains(needs.parse_info.outputs.team_slug, 'monorepo')
+    runs-on: ubuntu-latest
+    steps:
+      - name: check privilege
+        run: |
+          maintainers=(
+            "mvines"
+            "CriesofCarrots"
+            "joeaba"
+            "t-nelson"
+            "sakridge"
+            "yihau"
+          )
+          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+            exit 1
+          fi
+
+  check_privilege_for_spl:
+    needs: [parse_info]
+    if: contains(needs.parse_info.outputs.team_slug, 'spl')
+    runs-on: ubuntu-latest
+    steps:
+      - name: check privilege
+        run: |
+          maintainers=(
+            "mvines"
+            "CriesofCarrots"
+            "joeaba"
+            "t-nelson"
+            "sakridge"
+            "yihau"
+            "joncinque"
+          )
+          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+            exit 1
+          fi
+
+  remove_from_previous_team:
+    needs: [parse_info, check_privilege_for_mono, check_privilege_for_spl]
+    if: |
+      always() &&
+      (needs.parse_info.outputs.previous_team_slug != '') &&
+      (needs.check_privilege_for_mono.result == 'success' || needs.check_privilege_for_spl.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v6
@@ -117,12 +140,14 @@ jobs:
             })
 
   add_to_team:
-    needs: [parse_info]
-    if: needs.parse_info.outputs.team_slug != ''
+    needs: [parse_info, check_privilege_for_mono, check_privilege_for_spl]
+    if: |
+      always() &&
+      (needs.parse_info.outputs.team_slug != '') &&
+      (needs.check_privilege_for_mono.result == 'success' || needs.check_privilege_for_spl.result == 'success')
     runs-on: ubuntu-latest
     steps:
-      - name: add to team
-        uses: actions/github-script@v6
+      - uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT }}
           script: |

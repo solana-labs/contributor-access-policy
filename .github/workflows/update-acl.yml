@@ -12,7 +12,12 @@ jobs:
     steps:
       - name: check privilege
         run: |
-          echo "${{github.event.sender.login}}"
+          maintainers=(
+            "joeaba"
+          )
+          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+            exit 1
+          fi
 
   parse_info:
     needs: [check_permission]

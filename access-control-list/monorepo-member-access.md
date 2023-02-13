@@ -41,3 +41,4 @@ This is a page for keeping track of members with different levels of access to t
 | wen-coding     | wen#5907                         | 1            |
 | LucasSte       | LucasSte#2331                    | 1            |
 | nvjle          | jasoneck#7001                    | 1            |
+| chidocibot | chido#6488 | 1 |

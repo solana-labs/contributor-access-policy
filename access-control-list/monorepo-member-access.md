@@ -43,4 +43,4 @@ This is a page for keeping track of members with different levels of access to t
 | wen-coding     | wen#5907                         | 1            |
 | LucasSte       | LucasSte#2331                    | 1            |
 | aditya-solana  | adityak#2261                     | 1            |
-| mschneider     | Maximilian#2266                  | 1            |
+| mschneider     | Maximilian#2266                  | 1            || xiangzhu70 | xiangzhu70#0432 | 1 |

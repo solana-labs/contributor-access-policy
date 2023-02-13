@@ -31,6 +31,8 @@ This is a page for keeping track of members with different levels of access to t
 | KirillLykov    | kirill_l#4694                    | 2            |
 | alessandrod    | alessandrod#2813                 | 2            |
 | apfitzge       | andrew.fitzgerald#1084           | 2            |
+| ryoqun         | ryoqun#1525                      | 2            |
+| nvjle          | jasoneck#7001                    | 2            |
 | godmodegalactus| gmgalactus#3724                  | 1            |
 | steveluscher   | steveluscher#4227                | 1            |
 | 2501babe       | hana#9874                        | 1            |
@@ -40,5 +42,5 @@ This is a page for keeping track of members with different levels of access to t
 | askibin        | ska#6445                         | 1            |
 | wen-coding     | wen#5907                         | 1            |
 | LucasSte       | LucasSte#2331                    | 1            |
-| nvjle          | jasoneck#7001                    | 1            |
-| chidocibot | chido#6488 | 2 |
+| aditya-solana  | adityak#2261                     | 1            |
+| mschneider     | Maximilian#2266                  | 1            |

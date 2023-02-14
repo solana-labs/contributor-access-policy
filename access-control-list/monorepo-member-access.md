@@ -46,3 +46,4 @@ This is a page for keeping track of members with different levels of access to t
 | mschneider     | Maximilian#2266                  | 1            |
 | xiangzhu70     | xiangzhu70#0432                  | 2 |
 | jacobcreech | JacobCreech#3467 | 1 |
+| seanyoung | seanyoung#0481 | 1 |

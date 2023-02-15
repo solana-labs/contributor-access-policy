@@ -27,7 +27,7 @@ This is a page for keeping track of members with different levels of access to t
 | ryoqun         | ryoqun#1525                   | 2            |
 | steveluscher   | steveluscher#4227             | 1            |
 | pgarg66        | pgarg#8884                    | 1            |
-| jordansexton   | jordaaash#3040                | 1            |
+| jordansexton   | jordaaash#3040                | 2 |
 | LucasSte       | LucasSte#2331                 | 1            |
 | nvjle          | jasoneck#7001                 | 1            |
 | steviez        | steviez#9185                  | 1            |

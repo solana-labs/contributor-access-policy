@@ -48,3 +48,4 @@ This is a page for keeping track of members with different levels of access to t
 | jacobcreech | JacobCreech#3467 | 1 |
 | seanyoung | seanyoung#0481 | 1 |
 | yhchiang-sol | yhchiang.sol#0592 | 1 |
+| pieceofr | RachaelPai#8281 | 1 |

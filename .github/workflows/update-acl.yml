@@ -125,3 +125,18 @@ jobs:
               state: 'closed',
               state_reasonstring: 'completed'
             })
+
+  on_failure:
+    needs: [close]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: "${{ github.event.label.name }}"
+            })

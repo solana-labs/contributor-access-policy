@@ -6,7 +6,8 @@ on:
       - labeled
 
 jobs:
-  check_permission:
+  # trigged by github-action bot with Joe's github token.
+  check_permission_on_approved:
     if: github.event.label.name == 'approved'
     runs-on: ubuntu-latest
     steps:
@@ -19,8 +20,25 @@ jobs:
             exit 1
           fi
 
+  # for accident recovery
+  check_permission_on_update_acl:
+    if: github.event.label.name == 'update-acl'
+    runs-on: ubuntu-latest
+    steps:
+      - name: check privilege
+        run: |
+          maintainers=(
+            "yihau"
+          )
+          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+            exit 1
+          fi
+
   parse_info:
-    needs: [check_permission]
+    needs: [check_permission_on_approved, check_permission_on_update_acl]
+    if: |
+      always() &&
+      (needs.check_permission_on_approved.result == 'success' || needs.check_permission_on_update_acl.result == 'success')
     runs-on: ubuntu-latest
     outputs:
       file_path: ${{ steps.main.outputs.file_path }}
@@ -91,6 +109,7 @@ jobs:
 
   update_acl:
     needs: [parse_info]
+    if: always() && needs.parse_info.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -113,11 +132,21 @@ jobs:
 
   close:
     needs: [update_acl]
+    if: always() && needs.update_acl.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v6
         with:
           script: |
+            if(context.payload.label.name === "update-acl") {
+              github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: "${{ github.event.label.name }}"
+              })
+            }
+
             github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,

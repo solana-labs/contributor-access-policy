@@ -50,4 +50,4 @@ This is a page for keeping track of members with different levels of access to t
 | yhchiang-sol | yhchiang.sol#0592 | 1 |
 | pieceofr | RachaelPai#8281 | 1 |
 | diman-io | DimAn#2366 | 1 |
-| jcivlin | jcivlin#1503 | 1 |
+| jcivlin | jcivlin#1503 | 2 |

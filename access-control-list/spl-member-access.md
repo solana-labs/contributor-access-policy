@@ -33,3 +33,4 @@ This is a page for keeping track of members with different levels of access to t
 | steviez        | steviez#9185                  | 1            |
 | aditya-solana  | adityak#2261                  | 1            |
 | yhchiang-sol | yhchiang.sol#0592 | 1 |
+| ickfrosty | ickfrosty#7853 | 1 |

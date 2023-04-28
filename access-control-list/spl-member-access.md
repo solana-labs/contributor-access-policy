@@ -35,3 +35,4 @@ This is a page for keeping track of members with different levels of access to t
 | yhchiang-sol | yhchiang.sol#0592 | 1 |
 | ickfrosty | ickfrosty#7853 | 1 |
 | buffalojoec | buffalojoe#9214 | 1 |
+| austbot | austbot#5445 | 1 |

@@ -49,61 +49,46 @@ jobs:
       - id: main
         shell: bash
         run: |
-          body="${{ github.event.issue.body }}"
-          body=${body//$'\r'/}
-          body=${body//$'\n'/}
-          body=${body//$'\r\n'/}
-          regex="### GitHub Username[\r|\n|\r\n]*([0-9a-zA-Z-]*)[\r|\n|\r\n]*### Discord ID[\r|\n|\r\n]*(.{3,32}#[0-9]{4})"
-          if [[ ! $body =~ $regex ]]; then
-            echo "failed to parse issue body: $body"
-            exit 1
-          fi
+          set -e
+
+          soruce .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
+          source .github/scripts/parse-issue-body.sh "${{ github.event.issue.body }}"
+
           github_username="${BASH_REMATCH[1]}"
           discord_username="${BASH_REMATCH[2]}"
-          echo "github_username=$github_username" >> $GITHUB_OUTPUT
-          echo "discord_username=$discord_username" >> $GITHUB_OUTPUT
+          echo "github_username=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
+          echo "discord_username=$DISCORD_HANDLE" >> $GITHUB_OUTPUT
 
-          title="${{ github.event.issue.title }}"
-          regex="Request (.*) access for (.*) to the (.*)"
-          if [[ ! $title =~ $regex ]]
-          then
-            echo "failed to parse issue title: $title"
-            exit 1
-          else
-            privilege="${BASH_REMATCH[1]}"
-            repo="${BASH_REMATCH[3]}"
+          file_path=
+          case `echo $REPOSITORY | sed -e 's/^[[:space:]]*//'` in
+            "Solana Labs Monorepo")
+              file_path=access-control-list/monorepo-member-access.md
+            ;;
+            "SPL repository")
+              file_path=access-control-list/spl-member-access.md
+            ;;
+            *)
+              exit 1
+            ;;
+          esac
+          echo "file_path=$file_path" >> $GITHUB_OUTPUT
 
-            file_path=
-            case `echo $repo | sed -e 's/^[[:space:]]*//'` in
-              "Solana Labs Monorepo")
-                file_path=access-control-list/monorepo-member-access.md
-              ;;
-              "SPL repository")
-                file_path=access-control-list/spl-member-access.md
-              ;;
-              *)
-                exit 1
-              ;;
-            esac
-            echo "file_path=$file_path" >> $GITHUB_OUTPUT
+          level=
+          case $PRIVILEGE in
+            "Triage")
+              level=1
+            ;;
+            "Write")
+              level=2
+            ;;
+            *)
+              exit 1
+            ;;
+          esac
+          echo "level=$level" >> $GITHUB_OUTPUT
 
-            level=
-            case $privilege in
-              "Triage")
-                level=1
-              ;;
-              "Write")
-                level=2
-              ;;
-              *)
-                exit 1
-              ;;
-            esac
-            echo "level=$level" >> $GITHUB_OUTPUT
-          fi
-
-          echo "github_username=$github_username"
-          echo "discord_username=$discord_username"
+          echo "github_username=$GITHUB_HANDLE"
+          echo "discord_username=$DISCORD_HANDLE"
           echo "file_path=$file_path"
           echo "level=$level"
 

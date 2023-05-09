@@ -29,58 +29,19 @@ jobs:
       previous_team_slug: ${{ steps.main.outputs.previous_team_slug }}
       team_slug: ${{ steps.main.outputs.team_slug }}
     steps:
+      - uses: actions/checkout@v3
       - id: main
         run: |
-          regex="Request (.*) access for (.*) to the (.*)"
-          if [[ ! "${{ github.event.issue.title }}" =~ $regex ]]
-          then
-            exit 1
-          else
-            privilege="${BASH_REMATCH[1]}"
-            username="${BASH_REMATCH[2]}"
-            repo="${BASH_REMATCH[3]}"
+          set -e
 
-            previous_team_slug=
-            team_slug=
-            case `echo $repo | sed -e 's/^[[:space:]]*//'` in
-              "Solana Labs Monorepo")
-                case $privilege in
-                  "Triage")
-                    team_slug="monorepo-triage"
-                  ;;
-                  "Write")
-                    previous_team_slug="monorepo-triage"
-                    team_slug="monorepo-write"
-                  ;;
-                  *)
-                    exit 1
-                  ;;
-                esac
-              ;;
-              "SPL repository")
-                case $privilege in
-                  "Triage")
-                    team_slug="spl-triage"
-                  ;;
-                  "Write")
-                    previous_team_slug="spl-triage"
-                    team_slug="spl-write"
-                  ;;
-                  *)
-                    exit 1
-                  ;;
-                esac
-              ;;
-              *)
-                exit 1
-              ;;
-            esac
-          fi
+          soruce .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
+          source .github/scripts/parse-issue-body.sh "${{ github.event.issue.body }}"
+          soruce .github/scripts/get-team-slug.sh "$PRIVILEGE" "$REPOSITORY"
 
           echo "org=solana-labs" >> $GITHUB_OUTPUT
-          echo "username=$username" >> $GITHUB_OUTPUT
-          echo "previous_team_slug=$previous_team_slug" >> $GITHUB_OUTPUT
-          echo "team_slug=$team_slug" >> $GITHUB_OUTPUT
+          echo "username=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
+          echo "previous_team_slug=$PREVIOUS_TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "team_slug=$TEAM_SLUG" >> $GITHUB_OUTPUT
 
   check_privilege_for_mono:
     needs: [parse_info]

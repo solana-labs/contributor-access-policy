@@ -24,106 +24,99 @@ jobs:
     needs: link_to_issue
     runs-on: ubuntu-latest
     outputs:
-      org: ${{ steps.main.outputs.org }}
-      username: ${{ steps.main.outputs.username }}
-      previous_team_slug: ${{ steps.main.outputs.previous_team_slug }}
+      github_handle: ${{ steps.main.outputs.github_handle }}
+      discord_handle: ${{ steps.main.outputs.discord_handle }}
       team_slug: ${{ steps.main.outputs.team_slug }}
+      previous_team_slug: ${{ steps.main.outputs.previous_team_slug }}
+      privilege: ${{ steps.main.outputs.privilege }}
+      repository: ${{ steps.main.outputs.repository }}
     steps:
       - uses: actions/checkout@v3
       - id: main
+        shell: bash
         run: |
           set -e
 
-          soruce .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
+          source .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
           source .github/scripts/parse-issue-body.sh "${{ github.event.issue.body }}"
-          soruce .github/scripts/get-team-slug.sh "$PRIVILEGE" "$REPOSITORY"
+          source .github/scripts/get-team-slug.sh "$PRIVILEGE" "$REPOSITORY"
 
-          echo "org=solana-labs" >> $GITHUB_OUTPUT
-          echo "username=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
-          echo "previous_team_slug=$PREVIOUS_TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "github_handle=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
+          echo "discord_handle=$DISCORD_HANDLE" >> $GITHUB_OUTPUT
           echo "team_slug=$TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "previous_team_slug=$PREVIOUS_TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "privilege=$PRIVILEGE" >> $GITHUB_OUTPUT
+          echo "repository=$REPOSITORY" >> $GITHUB_OUTPUT
 
-  check_privilege_for_mono:
+          case $TEAM_SLUG in
+            *monorepo*)
+              maintainers=(
+                "mvines"
+                "CriesofCarrots"
+                "joeaba"
+                "t-nelson"
+                "sakridge"
+                "yihau"
+              )
+              if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+                echo "isn't a maintainer in monorepo"
+                exit 1
+              fi
+            ;;
+            *spl*)
+              maintainers=(
+                "mvines"
+                "CriesofCarrots"
+                "joeaba"
+                "t-nelson"
+                "sakridge"
+                "yihau"
+                "joncinque"
+              )
+              if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+                echo "isn't a maintainer in spl"
+                exit 1
+              fi
+            ;;
+            *)
+              echo "unexpected team slug: $TEAM_SLUG"
+              exit 1
+            ;;
+          esac
+
+  add_to_github_group:
     needs: [parse_info]
-    if: contains(needs.parse_info.outputs.team_slug, 'monorepo')
-    runs-on: ubuntu-latest
-    steps:
-      - name: check privilege
-        run: |
-          maintainers=(
-            "mvines"
-            "CriesofCarrots"
-            "joeaba"
-            "t-nelson"
-            "sakridge"
-            "yihau"
-          )
-          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
-            exit 1
-          fi
+    uses: ./.github/workflows/add-to-github-group.yml
+    with:
+      team_slug: ${{ needs.parse_info.outputs.team_slug }}
+      previous_team_slug: ${{ needs.parse_info.outputs.previous_team_slug }}
+      github_handle: ${{ needs.parse_info.outputs.github_handle }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
 
-  check_privilege_for_spl:
+  add_discord_role:
     needs: [parse_info]
-    if: contains(needs.parse_info.outputs.team_slug, 'spl')
-    runs-on: ubuntu-latest
-    steps:
-      - name: check privilege
-        run: |
-          maintainers=(
-            "mvines"
-            "CriesofCarrots"
-            "joeaba"
-            "t-nelson"
-            "sakridge"
-            "yihau"
-            "joncinque"
-          )
-          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
-            exit 1
-          fi
+    uses: ./.github/workflows/add-discord-role.yml
+    with:
+      discord_handle: ${{ needs.parse_info.outputs.discord_handle }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
+      DISCORD_DEVBOT_TOKEN: ${{ secrets.DISCORD_DEVBOT_TOKEN }}
+      DISCORD_SOLANA_GUILD_ID: ${{ secrets.DISCORD_SOLANA_GUILD_ID }}
 
-  remove_from_previous_team:
-    needs: [parse_info, check_privilege_for_mono, check_privilege_for_spl]
-    if: |
-      always() &&
-      (needs.parse_info.outputs.previous_team_slug != '') &&
-      (needs.check_privilege_for_mono.result == 'success' || needs.check_privilege_for_spl.result == 'success')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.PAT }}
-          script: |
-            github.rest.teams.removeMembershipForUserInOrg({
-              org: "${{ needs.parse_info.outputs.org }}",
-              team_slug: "${{ needs.parse_info.outputs.previous_team_slug }}",
-              username: "${{ needs.parse_info.outputs.username }}"
-            })
-
-  add_to_team:
-    needs: [parse_info, check_privilege_for_mono, check_privilege_for_spl]
-    if: |
-      always() &&
-      (needs.parse_info.outputs.team_slug != '') &&
-      (needs.check_privilege_for_mono.result == 'success' || needs.check_privilege_for_spl.result == 'success')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.PAT }}
-          script: |
-            github.rest.teams.addOrUpdateMembershipForUserInOrg({
-              org: "${{ needs.parse_info.outputs.org }}",
-              team_slug: "${{ needs.parse_info.outputs.team_slug }}",
-              username: "${{ needs.parse_info.outputs.username }}"
-            })
+  update_acl:
+    needs: [parse_info]
+    uses: ./.github/workflows/update-acl.yml
+    with:
+      github_handle: ${{ needs.parse_info.outputs.github_handle }}
+      discord_handle: ${{ needs.parse_info.outputs.discord_handle }}
+      repository: ${{ needs.parse_info.outputs.repository }}
+      privilege: ${{ needs.parse_info.outputs.privilege }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
 
   on_success:
-    needs: [add_to_team, remove_from_previous_team]
-    if: |
-      always() &&
-      (needs.add_to_team.result == 'success') &&
-      (needs.remove_from_previous_team.result == 'success' || needs.remove_from_previous_team.result == 'skipped')
+    needs: [add_to_github_group, add_discord_role, update_acl]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v6
@@ -142,9 +135,16 @@ jobs:
               issue_number: context.issue.number,
               name: "${{ github.event.label.name }}"
             })
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              state_reasonstring: 'completed'
+            })
 
   on_failure:
-    needs: [add_to_team, remove_from_previous_team]
+    needs: [add_to_github_group, add_discord_role, update_acl]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     steps:

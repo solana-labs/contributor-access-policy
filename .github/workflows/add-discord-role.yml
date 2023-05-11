@@ -1,0 +1,68 @@
+name: add-discord-role
+
+on:
+  workflow_call:
+    inputs:
+      discord_handle:
+        required: true
+        type: string
+    secrets:
+      PAT:
+        required: true
+      DISCORD_DEVBOT_TOKEN:
+        required: true
+      DISCORD_SOLANA_GUILD_ID:
+        required: true
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: |
+          set -e
+
+          if [[ ! "${{ inputs.discord_handle }}" =~ ([^#]+)#([0-9]+)$ ]]; then
+            echo "unexpected discord handle"
+            exit 1
+          fi
+
+          username="${BASH_REMATCH[1]}"
+          discriminator="${BASH_REMATCH[2]}"
+
+          userid=$(
+            curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search?limit=1000&query=$username" | \
+              jq --raw-output --arg discriminator "$discriminator" '.[] | select(.user.discriminator == $discriminator) | .user.id'
+          )
+          if [[ $userid = "null" ]]; then
+            echo "failed to get user id"
+            exit 1
+          fi
+
+          roleid=$(
+            curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/roles" | \
+              jq -r '.[] | select(.name=="Contributor") | .id'
+          )
+          if [[ $roleid = "null" ]]; then
+            echo "failed to get role id"
+            exit 1
+          fi
+
+          curl -s \
+            -X PUT \
+            -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+            -H "Content-Length: 0" \
+            "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/$userid/roles/$roleid"
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["discord"]
+            })

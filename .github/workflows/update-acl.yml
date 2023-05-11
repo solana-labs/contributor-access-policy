@@ -1,66 +1,35 @@
 name: update-acl
 
 on:
-  issues:
-    types:
-      - labeled
+  workflow_call:
+    inputs:
+      github_handle:
+        required: true
+        type: string
+      discord_handle:
+        required: true
+        type: string
+      repository:
+        required: true
+        type: string
+      privilege:
+        required: true
+        type: string
+    secrets:
+      PAT:
+        required: true
 
 jobs:
-  # trigged by github-action bot with Joe's github token.
-  check_permission_on_approved:
-    if: github.event.label.name == 'approved'
+  main:
     runs-on: ubuntu-latest
     steps:
-      - name: check privilege
-        run: |
-          maintainers=(
-            "joeaba"
-          )
-          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
-            exit 1
-          fi
-
-  # for accident recovery
-  check_permission_on_update_acl:
-    if: github.event.label.name == 'update-acl'
-    runs-on: ubuntu-latest
-    steps:
-      - name: check privilege
-        run: |
-          maintainers=(
-            "yihau"
-          )
-          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
-            exit 1
-          fi
-
-  parse_info:
-    needs: [check_permission_on_approved, check_permission_on_update_acl]
-    if: |
-      always() &&
-      (needs.check_permission_on_approved.result == 'success' || needs.check_permission_on_update_acl.result == 'success')
-    runs-on: ubuntu-latest
-    outputs:
-      file_path: ${{ steps.main.outputs.file_path }}
-      level: ${{ steps.main.outputs.level }}
-      github_username: ${{ steps.main.outputs.github_username }}
-      discord_username: ${{ steps.main.outputs.discord_username }}
-    steps:
-      - id: main
-        shell: bash
+      - uses: actions/checkout@v3
+      - shell: bash
         run: |
           set -e
 
-          soruce .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
-          source .github/scripts/parse-issue-body.sh "${{ github.event.issue.body }}"
-
-          github_username="${BASH_REMATCH[1]}"
-          discord_username="${BASH_REMATCH[2]}"
-          echo "github_username=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
-          echo "discord_username=$DISCORD_HANDLE" >> $GITHUB_OUTPUT
-
           file_path=
-          case `echo $REPOSITORY | sed -e 's/^[[:space:]]*//'` in
+          case `echo "${{ inputs.repository }}" | sed -e 's/^[[:space:]]*//'` in
             "Solana Labs Monorepo")
               file_path=access-control-list/monorepo-member-access.md
             ;;
@@ -68,89 +37,37 @@ jobs:
               file_path=access-control-list/spl-member-access.md
             ;;
             *)
+              echo "unexpected repositroy: ${{ inputs.repository }}"
               exit 1
             ;;
           esac
-          echo "file_path=$file_path" >> $GITHUB_OUTPUT
 
-          level=
-          case $PRIVILEGE in
+          case ${{ inputs.privilege }} in
             "Triage")
-              level=1
+              echo "| ${{ inputs.github_handle }} | ${{ inputs.discord_handle }} | 1 |" >> $file_path
             ;;
             "Write")
-              level=2
+              sed -i -e 's/|\(.*${{ inputs.github_handle }}.*\)|\(.*${{ inputs.discord_handle }}.*\)|\(.*\)|/|\1|\2| 2 |/g' $file_path
             ;;
             *)
+              echo "unexpected privilege: ${{ inputs.privilege }}"
               exit 1
             ;;
           esac
-          echo "level=$level" >> $GITHUB_OUTPUT
 
-          echo "github_username=$GITHUB_HANDLE"
-          echo "discord_username=$DISCORD_HANDLE"
-          echo "file_path=$file_path"
-          echo "level=$level"
-
-  update_acl:
-    needs: [parse_info]
-    if: always() && needs.parse_info.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - if: needs.parse_info.outputs.level == 1
-        run: |
-          echo "| ${{ needs.parse_info.outputs.github_username }} | ${{ needs.parse_info.outputs.discord_username }} | ${{ needs.parse_info.outputs.level }} |" >> ${{ needs.parse_info.outputs.file_path }}
-
-      - if: needs.parse_info.outputs.level == 2
-        run: |
-          sed -i -e 's/|\(.*${{ needs.parse_info.outputs.github_username }}.*\)|\(.*${{ needs.parse_info.outputs.discord_username }}.*\)|\(.*\)|/|\1|\2| ${{ needs.parse_info.outputs.level }} |/g' ${{ needs.parse_info.outputs.file_path }}
-
-      - name: push
-        run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add ${{ needs.parse_info.outputs.file_path }}
+          git add "$file_path"
           git commit -m "update acl"
           git push
 
-  close:
-    needs: [update_acl]
-    if: always() && needs.update_acl.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
-            if(context.payload.label.name === "update-acl") {
-              github.rest.issues.removeLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                name: "${{ github.event.label.name }}"
-              })
-            }
-
-            github.rest.issues.update({
+            github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              state: 'closed',
-              state_reasonstring: 'completed'
-            })
-
-  on_failure:
-    needs: [close]
-    if: ${{ failure() }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: "${{ github.event.label.name }}"
+              labels: ["access-control-list"]
             })

@@ -3,6 +3,9 @@ name: add-discord-role
 on:
   workflow_call:
     inputs:
+      team_slug:
+        required: true
+        type: string
       discord_handle:
         required: true
         type: string
@@ -18,7 +21,9 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - shell: bash
+      - name: parse-info
+        shell: bash
+        id: info
         run: |
           set -e
 
@@ -40,6 +45,32 @@ jobs:
             exit 1
           fi
 
+          echo "userid=$userid" >> $GITHUB_OUTPUT
+
+          case ${{ inputs.team_slug }} in
+          "monorepo-triage")
+            echo "new_role_name=Monorepo-Triage" >> $GITHUB_OUTPUT
+            ;;
+          "monorepo-write")
+            echo "new_role_name=Monorepo-Write" >> $GITHUB_OUTPUT
+            echo "old_role_name=Monorepo-Triage" >> $GITHUB_OUTPUT
+            ;;
+          "spl-triage")
+            echo "new_role_name=SPL-Triage" >> $GITHUB_OUTPUT
+            ;;
+          "spl-write")
+            echo "new_role_name=SPL-Write" >> $GITHUB_OUTPUT
+            echo "old_role_name=SPL-Triage" >> $GITHUB_OUTPUT
+            ;;
+          *)
+            echo "unexpected team slug: ${{ inputs.team_slug }}"
+            exit 1
+            ;;
+          esac
+
+      - name: add contributor role
+        shell: bash
+        run: |
           roleid=$(
             curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
               "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/roles" | \
@@ -54,7 +85,47 @@ jobs:
             -X PUT \
             -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
             -H "Content-Length: 0" \
-            "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/$userid/roles/$roleid"
+            "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/${{ steps.info.outputs.userid }}/roles/$roleid"
+
+      - name: add new role
+        if: ${{ steps.info.outputs.new_role_name }}
+        shell: bash
+        run: |
+          roleid=$(
+            curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/roles" | \
+              jq -r '.[] | select(.name=="${{ steps.info.outputs.new_role_name }}") | .id'
+          )
+          if [[ $roleid = "null" ]]; then
+            echo "failed to get role id"
+            exit 1
+          fi
+
+          curl -s \
+            -X PUT \
+            -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+            -H "Content-Length: 0" \
+            "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/${{ steps.info.outputs.userid }}/roles/$roleid"
+
+      - name: remove old role
+        if: ${{ steps.info.outputs.old_role_name }}
+        shell: bash
+        run: |
+          roleid=$(
+            curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/roles" | \
+              jq -r '.[] | select(.name=="${{ steps.info.outputs.old_role_name }}") | .id'
+          )
+          if [[ $roleid = "null" ]]; then
+            echo "failed to get role id"
+            exit 1
+          fi
+
+          curl -s \
+            -X DELETE \
+            -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+            -H "Content-Length: 0" \
+            "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/${{ steps.info.outputs.userid }}/roles/$roleid"
 
       - uses: actions/github-script@v6
         with:

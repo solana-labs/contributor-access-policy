@@ -98,6 +98,7 @@ jobs:
     needs: [parse_info]
     uses: ./.github/workflows/add-discord-role.yml
     with:
+      team_slug: ${{ needs.parse_info.outputs.team_slug }}
       discord_handle: ${{ needs.parse_info.outputs.discord_handle }}
     secrets:
       PAT: ${{ secrets.PAT }}

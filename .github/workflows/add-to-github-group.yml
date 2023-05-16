@@ -1,0 +1,55 @@
+name: add-to-github-group
+
+on:
+  workflow_call:
+    inputs:
+      team_slug:
+        required: true
+        type: string
+      previous_team_slug:
+        required: false
+        type: string
+      github_handle:
+        required: true
+        type: string
+    secrets:
+      PAT:
+        required: true
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: add_to_team
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.teams.addOrUpdateMembershipForUserInOrg({
+              org: "${{ github.repository_owner }}",
+              team_slug: "${{ inputs.team_slug }}",
+              username: "${{ inputs.github_handle }}"
+            })
+
+      - name: remove_from_previous_team
+        if: ${{ inputs.previous_team_slug }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.teams.removeMembershipForUserInOrg({
+              org: "${{ github.repository_owner }}",
+              team_slug: "${{ inputs.previous_team_slug }}",
+              username: "${{ inputs.github_handle }}"
+            })
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["github"]
+            })

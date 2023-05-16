@@ -53,3 +53,4 @@ This is a page for keeping track of members with different levels of access to t
 | jcivlin | jcivlin#1503 | 2 |
 | ickfrosty | ickfrosty#7853 | 1 |
 | gregcusack | mynamegreg#1728 | 2 |
+| deantheking | deanking#8560 | 1 |

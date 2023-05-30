@@ -94,7 +94,7 @@ To receive any access level to the SPL repository or the monorepo, follow these 
 following the [templates for the respective access level](https://github.com/solana-labs/contributor-access-policy/issues/new/choose).
 2. Gather your vouchers to add a comment on the issue expressing their support.
 3. Once the issue has received enough support, notify a user with Maintain
-access to the respective repository by adding a comment tagging him. A list of members and their access levels can be found [here](https://github.com/solana-labs/contributor-access-policy/access-control-list).
+access to the respective repository by adding a comment tagging him. A list of members and their access levels can be found [here](https://github.com/solana-labs/contributor-access-policy/tree/master/access-control-list).
 4. It would take 3 business days for the request to be processed.
 
 **Note**: The vouching comments on the issue should be made in the following format:

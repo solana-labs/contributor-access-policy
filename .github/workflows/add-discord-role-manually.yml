@@ -1,0 +1,134 @@
+name: add-discord-role-manually
+
+on:
+  issues:
+    types:
+      - labeled
+
+jobs:
+  check:
+    if: github.event.label.name == 'trigger-discord'
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: |
+          set -e
+
+          maintainers=(
+            "yihau"
+          )
+          if [[ ! " ${maintainers[*]} " =~ " ${{github.event.sender.login}} " ]]; then
+            echo "unexpected user"
+            exit 1
+          fi
+
+  link_to_issue:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            })
+
+  parse_info:
+    needs: link_to_issue
+    runs-on: ubuntu-latest
+    outputs:
+      github_handle: ${{ steps.main.outputs.github_handle }}
+      discord_handle: ${{ steps.main.outputs.discord_handle }}
+      team_slug: ${{ steps.main.outputs.team_slug }}
+      previous_team_slug: ${{ steps.main.outputs.previous_team_slug }}
+      privilege: ${{ steps.main.outputs.privilege }}
+      repository: ${{ steps.main.outputs.repository }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: main
+        shell: bash
+        run: |
+          set -e
+
+          source .github/scripts/parse-issue-title.sh "${{ github.event.issue.title }}"
+          source .github/scripts/parse-issue-body.sh "${{ github.event.issue.body }}"
+          source .github/scripts/get-team-slug.sh "$PRIVILEGE" "$REPOSITORY"
+
+          echo "github_handle=$GITHUB_HANDLE" >> $GITHUB_OUTPUT
+          echo "discord_handle=$DISCORD_HANDLE" >> $GITHUB_OUTPUT
+          echo "team_slug=$TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "previous_team_slug=$PREVIOUS_TEAM_SLUG" >> $GITHUB_OUTPUT
+          echo "privilege=$PRIVILEGE" >> $GITHUB_OUTPUT
+          echo "repository=$REPOSITORY" >> $GITHUB_OUTPUT
+
+  add_discord_role:
+    needs: [parse_info]
+    uses: ./.github/workflows/add-discord-role.yml
+    with:
+      team_slug: ${{ needs.parse_info.outputs.team_slug }}
+      discord_handle: ${{ needs.parse_info.outputs.discord_handle }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
+      DISCORD_DEVBOT_TOKEN: ${{ secrets.DISCORD_DEVBOT_TOKEN }}
+      DISCORD_SOLANA_GUILD_ID: ${{ secrets.DISCORD_SOLANA_GUILD_ID }}
+
+  on_success:
+    needs: [add_discord_role]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: "${{ github.event.label.name }}"
+            })
+
+            let required_labels = new Map()
+            required_labels.set('discord', true)
+            required_labels.set('github', true)
+            required_labels.set('access-control-list', true)
+
+            let res = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            res.data.forEach(label => { required_labels.delete(label.name) })
+
+            if (required_labels.size == 0) {
+              github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ["approved"]
+              })
+              github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+                state_reasonstring: 'completed'
+              })
+            }
+
+  on_failure:
+    needs: [add_discord_role]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: "${{ github.event.label.name }}"
+            })

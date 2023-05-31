@@ -36,8 +36,12 @@ jobs:
           discriminator="${BASH_REMATCH[2]}"
 
           userid=$(
-            curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
-              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search?limit=1000&query=$username" | \
+            curl -s \
+              -G \
+              -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+              --data-urlencode "limit=1000" \
+              --data-urlencode "query=$username" \
+              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search" | \
               jq --raw-output --arg discriminator "$discriminator" '.[] | select(.user.discriminator == $discriminator) | .user.id'
           )
           if [[ $userid = "null" ]]; then

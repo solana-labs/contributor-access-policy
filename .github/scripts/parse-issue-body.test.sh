@@ -98,3 +98,39 @@ EOF
 
   check "expected intput #2" "$input" "yihau" "chido#6488"
 )
+
+(
+  input=$(
+    cat <<EOF
+### GitHub Username
+
+yihau
+
+### Discord ID
+
+chido6488
+EOF
+  )
+
+  check "expected intput #3" "$input" "yihau" "chido6488"
+)
+
+(
+  input=$(
+    cat <<EOF
+### GitHub Username
+
+yihau
+
+### Discord ID
+
+chido6488
+
+### Previously approved Triage access request issue
+
+https://github.com/solana-labs/contributor-access-policy/issues/xxx
+EOF
+  )
+
+  check "expected intput #4" "$input" "yihau" "chido6488"
+)

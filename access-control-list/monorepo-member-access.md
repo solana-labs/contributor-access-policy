@@ -56,3 +56,4 @@ This is a page for keeping track of members with different levels of access to t
 | deantheking | deanking#8560 | 1 |
 | michaelh-laine | laine_sa | stakewiz.com#2445 | 1 |
 | grooviegermanikus | grooviegermanikus#5480 | 1 |
+| buffalu | buffalu | 1 |

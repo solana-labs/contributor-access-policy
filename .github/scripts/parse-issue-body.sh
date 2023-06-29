@@ -10,9 +10,8 @@ body=$1
 
 body=${body//$'\r'/}
 body=${body//$'\n'/}
-body=${body//$'\r\n'/}
 
-regex="### GitHub Username[\r|\n|\r\n]*([0-9a-zA-Z-]*)[\r|\n|\r\n]*### Discord ID[\r|\n|\r\n]*(.{3,32}#[0-9]{4})"
+regex='### GitHub Username([0-9a-zA-Z-]*)### Discord ID(.{3,32}#[0-9]{4}|[^#@:`]{3,32})'
 if [[ ! $body =~ $regex ]]; then
   echo "unexpected pattern"
   exit 1

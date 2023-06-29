@@ -27,25 +27,35 @@ jobs:
         run: |
           set -e
 
-          if [[ ! "${{ inputs.discord_handle }}" =~ ([^#]+)#([0-9]+)$ ]]; then
-            echo "unexpected discord handle"
-            exit 1
+          discord_handle="${{ inputs.discord_handle }}"
+          userid=""
+          if [[ "$discord_handle" =~ ([^#]+)#([0-9]+)$ ]]; then
+            username="${BASH_REMATCH[1]}"
+            discriminator="${BASH_REMATCH[2]}"
+
+            userid=$(
+              curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+                "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search?limit=1000&query=$username" | \
+                jq --raw-output --arg discriminator "$discriminator" '.[] | select(.user.discriminator == $discriminator) | .user.id'
+            )
+          else
+            result=$(
+              curl -s -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
+                "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search?limit=1000&query=$discord_handle" | \
+                jq --raw-output --arg username "$discord_handle" '.[] | select(.user.username == $username) | .user.id'
+            )
+
+            results=($result)
+            if [[ "${#results[@]}" -gt 1 ]]; then
+              echo "too many results"
+              exit 1
+            fi
+
+            userid="${results[0]}"
           fi
 
-          username="${BASH_REMATCH[1]}"
-          discriminator="${BASH_REMATCH[2]}"
-
-          userid=$(
-            curl -s \
-              -G \
-              -H "Authorization: Bot ${{ secrets.DISCORD_DEVBOT_TOKEN }}" \
-              --data-urlencode "limit=1000" \
-              --data-urlencode "query=$username" \
-              "https://discord.com/api/guilds/${{ secrets.DISCORD_SOLANA_GUILD_ID }}/members/search" | \
-              jq --raw-output --arg discriminator "$discriminator" '.[] | select(.user.discriminator == $discriminator) | .user.id'
-          )
-          if [[ $userid = "null" ]]; then
-            echo "failed to get user id"
+          if [[ -z $userid ]]; then
+            echo "get empty user id"
             exit 1
           fi
 

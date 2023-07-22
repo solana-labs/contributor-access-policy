@@ -57,3 +57,4 @@ This is a page for keeping track of members with different levels of access to t
 | michaelh-laine | laine_sa | stakewiz.com#2445 | 1 |
 | grooviegermanikus | grooviegermanikus#5480 | 1 |
 | buffalu | buffalu | 1 |
+| musitdev | philippe#9088 | 1 |

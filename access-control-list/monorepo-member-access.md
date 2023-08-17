@@ -58,4 +58,4 @@ This is a page for keeping track of members with different levels of access to t
 | grooviegermanikus | grooviegermanikus#5480 | 1 |
 | buffalu | buffalu | 1 |
 | musitdev | philippe#9088 | 1 |
-| buffalojoec | buffalojoe | 1 |
+| buffalojoec | buffalojoe | 2 |

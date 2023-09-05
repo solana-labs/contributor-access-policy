@@ -36,3 +36,4 @@ This is a page for keeping track of members with different levels of access to t
 | ickfrosty | ickfrosty#7853 | 1 |
 | buffalojoec | buffalojoe#9214 | 2 |
 | austbot | austbot#5445 | 1 |
+| nickfrosty | nick_frosty | 2 |

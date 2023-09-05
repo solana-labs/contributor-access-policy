@@ -59,3 +59,4 @@ This is a page for keeping track of members with different levels of access to t
 | buffalu | buffalu | 1 |
 | musitdev | philippe#9088 | 1 |
 | buffalojoec | buffalojoe | 2 |
+| nickfrosty | nick_frosty | 2 |

@@ -37,3 +37,4 @@ This is a page for keeping track of members with different levels of access to t
 | buffalojoec | buffalojoe#9214 | 2 |
 | austbot | austbot#5445 | 1 |
 | nickfrosty | nick_frosty | 2 |
+| lorisleiva | loris5388 | 1 |

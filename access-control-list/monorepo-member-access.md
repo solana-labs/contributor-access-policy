@@ -60,3 +60,4 @@ This is a page for keeping track of members with different levels of access to t
 | musitdev | philippe#9088 | 1 |
 | buffalojoec | buffalojoe | 2 |
 | nickfrosty | nick_frosty | 2 |
+| rexstjohn-anza | infamous_iron_chef | 1 |

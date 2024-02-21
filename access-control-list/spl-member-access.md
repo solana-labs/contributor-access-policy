@@ -38,3 +38,4 @@ This is a page for keeping track of members with different levels of access to t
 | austbot | austbot#5445 | 1 |
 | nickfrosty | nick_frosty | 2 |
 | lorisleiva | loris5388 | 2 |
+| rexstjohn-anza | infamous_iron_chef | 1 |
